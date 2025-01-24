@@ -183,17 +183,45 @@ document.addEventListener('DOMContentLoaded', () => {
     KeyManager.refreshData();
 
     // 生成卡密表单提交
-    document.getElementById('generateForm').addEventListener('submit', async (e) => {
+    document.getElementById('generateForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const type = document.getElementById('keyType').value;
-        const count = parseInt(document.getElementById('keyCount').value);
         
+        const keyType = document.getElementById('keyType').value;
+        const keyCount = parseInt(document.getElementById('keyCount').value);
+        const keyPrice = parseFloat(document.getElementById('keyPrice').value);
+        
+        if (!keyPrice || keyPrice <= 0) {
+            alert('请输入有效的卡密价格');
+            return;
+        }
+
         try {
-            await KeyManager.generateKeys(type, count);
-            alert(`成功生成${count}个${type}卡密`);
+            // 生成卡密
+            const keys = [];
+            for (let i = 0; i < keyCount; i++) {
+                const key = generateRandomKey();
+                keys.push({
+                    key: key,
+                    type: keyType,
+                    price: keyPrice,
+                    status: 'active',
+                    createTime: new Date().toISOString(),
+                    useTime: null,
+                    deviceId: null
+                });
+            }
+            
+            // 更新卡密列表
+            updateKeyList(keys);
+            
+            // 清空输入
+            document.getElementById('keyCount').value = '1';
+            document.getElementById('keyPrice').value = '';
+            
+            alert('卡密生成成功！');
         } catch (error) {
-            console.error('生成卡密失败:', error);
-            alert('生成卡密失败: ' + error.message);
+            console.error('Error generating keys:', error);
+            alert('生成卡密失败，请重试');
         }
     });
 
@@ -213,4 +241,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-}); 
+});
+
+// 更新卡密列表显示
+function updateKeyList(keys) {
+    const tbody = document.getElementById('keyList');
+    keys.forEach(key => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${key.key}</td>
+            <td>${key.type}</td>
+            <td>￥${key.price.toFixed(2)}</td>
+            <td>${key.status === 'active' ? '<span class="status-active">未使用</span>' : '<span class="status-used">已使用</span>'}</td>
+            <td>${formatDate(key.createTime)}</td>
+            <td>${key.useTime ? formatDate(key.useTime) : '-'}</td>
+            <td>${key.deviceId || '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteKey('${key.key}')">删除</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// 格式化日期
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+// 生成随机卡密
+function generateRandomKey() {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let key = '';
+    for (let i = 0; i < 16; i++) {
+        key += chars[Math.floor(Math.random() * chars.length)];
+        if (i % 4 === 3 && i !== 15) key += '-';
+    }
+    return key;
+} 

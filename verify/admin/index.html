@@ -9,9 +9,27 @@
         .card { margin-bottom: 20px; }
         .status-active { color: green; }
         .status-used { color: red; }
+        .navbar { margin-bottom: 20px; }
     </style>
 </head>
 <body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">卡密管理系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn">退出登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-4">
         <h2 class="mb-4">卡密管理系统</h2>
         
@@ -23,17 +41,20 @@
             <div class="card-body">
                 <form id="generateForm">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <select class="form-select" id="keyType">
                                 <option value="month">月卡</option>
                                 <option value="season">季卡</option>
                                 <option value="year">年卡</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <input type="number" class="form-control" id="keyPrice" placeholder="卡密价格" min="1" step="0.01">
+                        </div>
+                        <div class="col-md-3">
                             <input type="number" class="form-control" id="keyCount" placeholder="生成数量" min="1" value="1">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <button type="submit" class="btn btn-primary">生成卡密</button>
                         </div>
                     </div>
@@ -86,6 +107,7 @@
                         <tr>
                             <th>卡密</th>
                             <th>类型</th>
+                            <th>价格</th>
                             <th>状态</th>
                             <th>生成时间</th>
                             <th>使用时间</th>
@@ -125,6 +147,23 @@
     </div>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 检查登录状态
+        function checkLogin() {
+            if (!localStorage.getItem('isLoggedIn')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+        });
+
+        // 页面加载时检查登录状态
+        checkLogin();
+    </script>
     <script src="admin.js"></script>
 </body>
 </html> 
