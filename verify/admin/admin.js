@@ -348,7 +348,48 @@ const KeyManager = {
     }
 };
 
-// 添加token配置UI
+// Token管理工具
+const TokenManager = {
+    // 导出token配置
+    exportConfig() {
+        const config = {
+            token: GitHubConfig.token,
+            timestamp: new Date().toISOString(),
+            repo: `${GitHubConfig.owner}/${GitHubConfig.repo}`
+        };
+        
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'github-token-config.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    },
+    
+    // 导入token配置
+    async importConfig(file) {
+        try {
+            const text = await file.text();
+            const config = JSON.parse(text);
+            
+            if (!config.token) {
+                throw new Error('配置文件中没有找到token');
+            }
+            
+            GitHubConfig.token = config.token;
+            return true;
+        } catch (error) {
+            console.error('Error importing config:', error);
+            return false;
+        }
+    }
+};
+
+// 修改token配置UI
 function showTokenDialog() {
     const modalHtml = `
         <div class="modal fade" id="tokenModal" tabindex="-1">
@@ -360,11 +401,25 @@ function showTokenDialog() {
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-warning">
-                            Token仅会保存在本地浏览器中，请妥善保管。
+                            Token仅会保存在本地浏览器中，建议导出配置文件备份。
                         </div>
                         <div class="mb-3">
                             <label class="form-label">GitHub Token</label>
                             <input type="password" class="form-control" id="tokenInput" value="${GitHubConfig.token}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">配置文件</label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" onclick="TokenManager.exportConfig()">
+                                    导出配置
+                                </button>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="configFile" accept=".json">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="importConfig()">
+                                        导入配置
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -384,25 +439,22 @@ function showTokenDialog() {
     });
 }
 
-// 保存token
-async function saveToken() {
-    const token = document.getElementById('tokenInput').value.trim();
-    if (!token) {
-        alert('请输入GitHub Token');
+// 导入配置文件
+async function importConfig() {
+    const fileInput = document.getElementById('configFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('请选择配置文件');
         return;
     }
     
-    GitHubConfig.token = token;
-    bootstrap.Modal.getInstance(document.getElementById('tokenModal')).hide();
-    
-    // 测试token
-    try {
-        await GitHubAPI.getFileContent();
-        alert('Token配置成功！');
+    const success = await TokenManager.importConfig(file);
+    if (success) {
+        alert('配置导入成功！');
         location.reload();
-    } catch (error) {
-        alert('Token无效，请检查后重试');
-        GitHubConfig.token = '';
+    } else {
+        alert('配置导入失败，请检查文件格式');
     }
 }
 
