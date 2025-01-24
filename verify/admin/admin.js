@@ -1,13 +1,77 @@
+// GitHub API配置
+const GitHubConfig = {
+    owner: 'liuSir002',
+    repo: 'king-verify',
+    branch: 'master',
+    token: '', // 这里需要填入你的Personal Access Token
+    dataPath: 'verify/admin/data/cards.json'
+};
+
+// GitHub API工具类
+const GitHubAPI = {
+    // 获取文件内容
+    async getFileContent() {
+        try {
+            const response = await fetch(`https://api.github.com/repos/${GitHubConfig.owner}/${GitHubConfig.repo}/contents/${GitHubConfig.dataPath}`, {
+                headers: {
+                    'Authorization': `token ${GitHubConfig.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch file');
+            
+            const data = await response.json();
+            return {
+                content: JSON.parse(atob(data.content)),
+                sha: data.sha
+            };
+        } catch (error) {
+            console.error('Error fetching file:', error);
+            return null;
+        }
+    },
+    
+    // 更新文件内容
+    async updateFile(content, sha) {
+        try {
+            const response = await fetch(`https://api.github.com/repos/${GitHubConfig.owner}/${GitHubConfig.repo}/contents/${GitHubConfig.dataPath}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GitHubConfig.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: '更新卡密数据',
+                    content: btoa(JSON.stringify(content, null, 2)),
+                    sha: sha,
+                    branch: GitHubConfig.branch
+                })
+            });
+            
+            if (!response.ok) throw new Error('Failed to update file');
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error updating file:', error);
+            throw error;
+        }
+    }
+};
+
 // 卡密管理器
 const KeyManager = {
     keys: [],
+    currentSha: null,
     
     // 初始化数据
     async init() {
         try {
-            const savedData = localStorage.getItem('cardKeys');
-            if (savedData) {
-                this.keys = JSON.parse(savedData);
+            const result = await GitHubAPI.getFileContent();
+            if (result) {
+                this.keys = result.content.cards || [];
+                this.currentSha = result.sha;
             } else {
                 this.keys = [];
             }
@@ -21,7 +85,21 @@ const KeyManager = {
     // 保存数据
     async saveData() {
         try {
-            localStorage.setItem('cardKeys', JSON.stringify(this.keys));
+            const data = {
+                cards: this.keys,
+                stats: {
+                    unused: this.keys.filter(k => k.status === 'active').length,
+                    used: this.keys.filter(k => k.status === 'used').length,
+                    active: 0,
+                    blocked: 0
+                },
+                last_updated: new Date().toISOString()
+            };
+            
+            const result = await GitHubAPI.updateFile(data, this.currentSha);
+            if (result) {
+                this.currentSha = result.content.sha;
+            }
             this.updateStats();
         } catch (error) {
             console.error('Error saving data:', error);
