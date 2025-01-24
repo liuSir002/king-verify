@@ -3,7 +3,12 @@ const GitHubConfig = {
     owner: 'liuSir002',
     repo: 'king-verify',
     branch: 'master',
-    token: '', // 这里需要填入你的Personal Access Token
+    get token() {
+        return localStorage.getItem('github_token') || '';
+    },
+    set token(value) {
+        localStorage.setItem('github_token', value);
+    },
     dataPath: 'verify/admin/data/cards.json'
 };
 
@@ -68,6 +73,10 @@ const KeyManager = {
     // 初始化数据
     async init() {
         try {
+            if (!GitHubConfig.token) {
+                showTokenDialog();
+                return;
+            }
             const result = await GitHubAPI.getFileContent();
             if (result) {
                 this.keys = result.content.cards || [];
@@ -78,6 +87,9 @@ const KeyManager = {
             this.updateStats();
         } catch (error) {
             console.error('Error loading data:', error);
+            if (error.message.includes('401')) {
+                showTokenDialog();
+            }
             this.keys = [];
         }
     },
@@ -335,6 +347,64 @@ const KeyManager = {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     }
 };
+
+// 添加token配置UI
+function showTokenDialog() {
+    const modalHtml = `
+        <div class="modal fade" id="tokenModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">配置GitHub Token</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            Token仅会保存在本地浏览器中，请妥善保管。
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">GitHub Token</label>
+                            <input type="password" class="form-control" id="tokenInput" value="${GitHubConfig.token}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="saveToken()">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('tokenModal'));
+    modal.show();
+    
+    document.getElementById('tokenModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+
+// 保存token
+async function saveToken() {
+    const token = document.getElementById('tokenInput').value.trim();
+    if (!token) {
+        alert('请输入GitHub Token');
+        return;
+    }
+    
+    GitHubConfig.token = token;
+    bootstrap.Modal.getInstance(document.getElementById('tokenModal')).hide();
+    
+    // 测试token
+    try {
+        await GitHubAPI.getFileContent();
+        alert('Token配置成功！');
+        location.reload();
+    } catch (error) {
+        alert('Token无效，请检查后重试');
+        GitHubConfig.token = '';
+    }
+}
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', async () => {
