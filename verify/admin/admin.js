@@ -5,9 +5,12 @@ const KeyManager = {
     // 初始化数据
     async init() {
         try {
-            const response = await fetch('data/cards.json');
-            const data = await response.json();
-            this.keys = data.cards;
+            const savedData = localStorage.getItem('cardKeys');
+            if (savedData) {
+                this.keys = JSON.parse(savedData);
+            } else {
+                this.keys = [];
+            }
             this.updateStats();
         } catch (error) {
             console.error('Error loading data:', error);
@@ -18,29 +21,7 @@ const KeyManager = {
     // 保存数据
     async saveData() {
         try {
-            const data = {
-                cards: this.keys,
-                stats: {
-                    unused: this.keys.filter(k => k.status === 'active').length,
-                    used: this.keys.filter(k => k.status === 'used').length,
-                    active: 0,
-                    blocked: 0
-                },
-                last_updated: new Date().toISOString()
-            };
-            
-            const response = await fetch('data/cards.json', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data, null, 4)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to save data');
-            }
-            
+            localStorage.setItem('cardKeys', JSON.stringify(this.keys));
             this.updateStats();
         } catch (error) {
             console.error('Error saving data:', error);
