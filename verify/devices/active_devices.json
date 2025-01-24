@@ -1,0 +1,18 @@
+{
+    "devices": {},
+    "device_limits": {
+        "max_devices_per_user": 3,
+        "max_inactive_days": 30,
+        "max_verify_frequency": 300
+    },
+    "device_tracking": {
+        "track_location": false,
+        "track_ip": true,
+        "track_usage": true
+    },
+    "cleanup_policy": {
+        "remove_inactive": true,
+        "cleanup_interval": 86400,
+        "backup_before_cleanup": true
+    }
+} 

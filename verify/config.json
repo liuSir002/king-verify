@@ -1,0 +1,21 @@
+{
+    "app_info": {
+        "name": "王者换装助手",
+        "version": "2.0.1",
+        "update_time": "2024-03-21",
+        "check_sum": "AUTO_GENERATED_HASH",
+        "valid_versions": ["2.0.0", "2.0.1"]
+    },
+    "server_config": {
+        "check_interval": 3600,
+        "api_version": "v1",
+        "force_update": false,
+        "verify_mode": "strict",
+        "time_offset": 28800,
+        "retry_limit": 3
+    },
+    "verify_nodes": [
+        "node_1", "node_2", "node_3"
+    ],
+    "_debug": false
+} 

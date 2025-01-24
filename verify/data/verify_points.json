@@ -1,0 +1,14 @@
+{
+    "check_points": {
+        "cp1": "ENCRYPTED_DATA_1",
+        "cp2": "ENCRYPTED_DATA_2",
+        "cp3": "ENCRYPTED_DATA_3"
+    },
+    "active_points": ["cp1", "cp3"],
+    "verify_sequence": [
+        {"point": "cp1", "weight": 0.3},
+        {"point": "cp2", "weight": 0.3},
+        {"point": "cp3", "weight": 0.4}
+    ],
+    "fallback_point": "cp2"
+} 

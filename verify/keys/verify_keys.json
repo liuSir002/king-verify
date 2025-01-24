@@ -1,0 +1,8 @@
+{
+    "keys": {
+        "k1": "BASE64_ENCODED_KEY_1",
+        "k2": "BASE64_ENCODED_KEY_2",
+        "k3": "BASE64_ENCODED_KEY_3"
+    },
+    "active_key": "k2"
+} 

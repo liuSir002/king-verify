@@ -1,0 +1,9 @@
+{
+    "data": {
+        "DEVICE_ID_HASH": {
+            "verify_count": 123,
+            "last_ip": "ENCRYPTED_IP",
+            "usage_data": "ENCRYPTED_DATA"
+        }
+    }
+} 

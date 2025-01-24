@@ -1,0 +1,28 @@
+{
+    "nodes": {
+        "primary": {
+            "url": "https://api.github.com/repos/liuSir002/king-verify/contents/verify",
+            "type": "github",
+            "auth_token": "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",
+            "timeout": 10000,
+            "retry_count": 3
+        },
+        "backup": {
+            "url": "https://gitee.com/api/v5/repos/liuSir002/king-verify/contents/verify",
+            "type": "gitee",
+            "auth_token": "",
+            "timeout": 10000,
+            "retry_count": 3
+        }
+    },
+    "node_selection": {
+        "strategy": "failover",
+        "check_interval": 300,
+        "health_threshold": 0.8
+    },
+    "api_endpoints": {
+        "verify": "/verify",
+        "status": "/status",
+        "update": "/update"
+    }
+} 

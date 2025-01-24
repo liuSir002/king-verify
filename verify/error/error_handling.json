@@ -1,0 +1,19 @@
+{
+    "error_codes": {
+        "1001": "设备验证失败",
+        "1002": "验证密钥无效",
+        "1003": "设备被封禁",
+        "1004": "验证请求超时",
+        "1005": "网络连接错误"
+    },
+    "retry_policy": {
+        "max_retries": 3,
+        "retry_interval": 5000,
+        "backoff_multiplier": 1.5
+    },
+    "error_actions": {
+        "block_device": ["1001", "1002", "1003"],
+        "notify_admin": ["1003"],
+        "log_error": ["*"]
+    }
+} 

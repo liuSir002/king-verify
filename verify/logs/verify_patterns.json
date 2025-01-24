@@ -1,0 +1,50 @@
+{
+    "patterns": {
+        "normal": {
+            "verify_interval": [3000, 4000],
+            "usage_pattern": "ENCRYPTED_PATTERN",
+            "network_pattern": "ENCRYPTED_PATTERN"
+        },
+        "suspicious": {
+            "rapid_verify": {
+                "threshold": 10,
+                "time_window": 60
+            },
+            "unusual_times": {
+                "start": "00:00",
+                "end": "04:00"
+            }
+        }
+    },
+    "actions": {
+        "pattern_violation": {
+            "first_action": "warning",
+            "second_action": "temporary_block",
+            "final_action": "permanent_block"
+        }
+    },
+    "verify_patterns": {
+        "device_verify": {
+            "type": "device_id",
+            "required": true,
+            "format": "^[A-Za-z0-9]{32}$",
+            "expiry": 86400
+        },
+        "key_verify": {
+            "type": "dynamic_key",
+            "required": true,
+            "length": 64,
+            "refresh_interval": 3600
+        },
+        "time_verify": {
+            "type": "timestamp",
+            "required": true,
+            "max_drift": 300
+        }
+    },
+    "verify_sequence": [
+        "device_verify",
+        "key_verify",
+        "time_verify"
+    ]
+} 

@@ -1,0 +1,13 @@
+{
+    "blocked_devices": [],
+    "block_rules": {
+        "max_devices_per_user": 3,
+        "max_login_attempts": 5,
+        "block_duration": 86400
+    },
+    "block_reasons": {
+        "multiple_devices": "超过最大设备数限制",
+        "invalid_attempts": "登录尝试次数过多",
+        "suspicious_activity": "可疑活动"
+    }
+} 

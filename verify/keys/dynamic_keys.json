@@ -1,0 +1,15 @@
+{
+    "key_config": {
+        "key_length": 64,
+        "key_lifetime": 3600,
+        "rotation_interval": 1800,
+        "algorithm": "sha256"
+    },
+    "active_keys": {},
+    "key_history": [],
+    "key_generation": {
+        "salt_length": 16,
+        "iteration_count": 10000,
+        "key_derivation": "pbkdf2"
+    }
+} 

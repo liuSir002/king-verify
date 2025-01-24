@@ -1,0 +1,36 @@
+{
+    "global_status": {
+        "total_devices": "ENCRYPTED_COUNT",
+        "active_sessions": "ENCRYPTED_COUNT",
+        "last_check": "2024-03-21"
+    },
+    "node_status": {
+        "node_1": {
+            "status": "active",
+            "load": "ENCRYPTED_LOAD",
+            "success_rate": "ENCRYPTED_RATE"
+        }
+    },
+    "alerts": {
+        "high_load": false,
+        "suspicious_activity": false
+    },
+    "service_status": {
+        "is_active": true,
+        "maintenance_mode": false,
+        "last_update": "",
+        "version": "1.0.0"
+    },
+    "verify_stats": {
+        "total_requests": 0,
+        "successful_verifies": 0,
+        "failed_verifies": 0,
+        "blocked_attempts": 0
+    },
+    "system_health": {
+        "api_status": "operational",
+        "database_status": "operational",
+        "last_check": "",
+        "issues": []
+    }
+} 
