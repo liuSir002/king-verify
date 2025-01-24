@@ -1,0 +1,20 @@
+// GitHub配置
+const GitHubConfig = {
+    // GitHub仓库所有者
+    owner: 'liuSir002',
+    
+    // 仓库名称
+    repo: 'king-verify',
+    
+    // 分支名称
+    branch: 'master',
+    
+    // GitHub Personal Access Token
+    token: 'your_github_token_here',
+    
+    // 数据文件路径
+    dataPath: 'verify/admin/data/cards.json'
+};
+
+// 不要修改这行
+window.GitHubConfig = GitHubConfig; 

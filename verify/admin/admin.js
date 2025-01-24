@@ -73,10 +73,6 @@ const KeyManager = {
     // 初始化数据
     async init() {
         try {
-            if (!GitHubConfig.token) {
-                showTokenDialog();
-                return;
-            }
             const result = await GitHubAPI.getFileContent();
             if (result) {
                 this.keys = result.content.cards || [];
@@ -87,9 +83,7 @@ const KeyManager = {
             this.updateStats();
         } catch (error) {
             console.error('Error loading data:', error);
-            if (error.message.includes('401')) {
-                showTokenDialog();
-            }
+            alert('加载数据失败，请检查配置文件是否正确');
             this.keys = [];
         }
     },
