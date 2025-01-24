@@ -21,11 +21,19 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        #loginContent {
+            display: none;
+        }
+        #errorContent {
+            display: none;
+            text-align: center;
+            padding: 50px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="login-container">
+        <div id="loginContent" class="login-container">
             <h2 class="login-title">管理后台登录</h2>
             <form id="loginForm">
                 <div class="mb-3">
@@ -39,22 +47,101 @@
                 <button type="submit" class="btn btn-primary w-100">登录</button>
             </form>
         </div>
+        <div id="errorContent" class="login-container">
+            <h2>404 Not Found</h2>
+            <p>The requested URL was not found on this server.</p>
+        </div>
     </div>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 简单的登录验证
+        // 清理过期日志
+        async function cleanExpiredLogs(config) {
+            if (!config.settings.auto_clean_logs) return config;
+
+            const now = new Date();
+            const retentionDays = config.settings.log_retention_days || 30;
+            const retentionMs = retentionDays * 24 * 60 * 60 * 1000;
+
+            // 过滤保留未过期的日志
+            const filteredLogs = config.logs.filter(log => {
+                const logDate = new Date(log.time);
+                return (now - logDate) <= retentionMs;
+            });
+
+            // 如果有日志被清理，更新配置文件
+            if (filteredLogs.length < config.logs.length) {
+                config.logs = filteredLogs;
+                try {
+                    const response = await fetch('config.json', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(config, null, 4)
+                    });
+                    if (!response.ok) {
+                        console.error('Failed to update config file');
+                    }
+                } catch (error) {
+                    console.error('Error updating config file:', error);
+                }
+            }
+
+            return config;
+        }
+
+        // 从配置文件加载IP白名单
+        async function loadIpWhitelist() {
+            try {
+                const response = await fetch('config.json');
+                const config = await response.json();
+                
+                // 清理过期日志
+                await cleanExpiredLogs(config);
+                
+                return config.ip_whitelist;
+            } catch (error) {
+                console.error('Error loading IP whitelist:', error);
+                return ['127.0.0.1']; // 默认只允许本地访问
+            }
+        }
+        
+        // 检查IP是否在白名单中
+        async function checkIpWhitelist() {
+            try {
+                const ipWhitelist = await loadIpWhitelist();
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                const clientIP = data.ip;
+                
+                if (ipWhitelist.includes(clientIP)) {
+                    document.getElementById('loginContent').style.display = 'block';
+                    document.getElementById('errorContent').style.display = 'none';
+                } else {
+                    document.getElementById('loginContent').style.display = 'none';
+                    document.getElementById('errorContent').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error checking IP:', error);
+                // 如果IP检查失败，默认显示404
+                document.getElementById('loginContent').style.display = 'none';
+                document.getElementById('errorContent').style.display = 'block';
+            }
+        }
+
+        // 页面加载时检查IP
+        window.addEventListener('load', checkIpWhitelist);
+
+        // 登录验证
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            // 这里使用简单的验证，实际应该使用更安全的方式
-            if (username === 'admin' && password === 'admin123') {
-                // 设置登录状态
+            if (username === 'admin' && password === 'admin1989') {
                 localStorage.setItem('isLoggedIn', 'true');
-                // 跳转到管理页面
                 window.location.href = 'index.html';
             } else {
                 alert('用户名或密码错误');

@@ -1,0 +1,26 @@
+{
+    "ip_whitelist": ["127.0.0.1", "223.74.221.112"],
+    "last_updated": "2024-03-19",
+    "description": "IP白名单配置文件",
+    "logs": [
+        {
+            "time": "2024-03-19 10:00:00",
+            "action": "init",
+            "ip": "127.0.0.1",
+            "note": "初始化本地测试IP"
+        },
+        {
+            "time": "2024-03-19 10:30:00",
+            "action": "add",
+            "ip": "223.74.221.112",
+            "note": "添加广东梅州IP地址"
+        }
+    ],
+    "settings": {
+        "max_log_entries": 100,
+        "auto_backup": true,
+        "backup_interval_days": 7,
+        "log_retention_days": 30,
+        "auto_clean_logs": true
+    }
+} 
