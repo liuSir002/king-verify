@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡密管理系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card { margin-bottom: 20px; }
+        .status-active { color: green; }
+        .status-used { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">卡密管理系统</h2>
+        
+        <!-- 生成卡密 -->
+        <div class="card">
+            <div class="card-header">
+                生成卡密
+            </div>
+            <div class="card-body">
+                <form id="generateForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select class="form-select" id="keyType">
+                                <option value="month">月卡</option>
+                                <option value="season">季卡</option>
+                                <option value="year">年卡</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control" id="keyCount" placeholder="生成数量" min="1" value="1">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary">生成卡密</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="card">
+            <div class="card-header">
+                统计信息
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>未使用卡密</h5>
+                        <p id="unusedCount">0</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>已使用卡密</h5>
+                        <p id="usedCount">0</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>活跃设备</h5>
+                        <p id="activeDevices">0</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>封禁设备</h5>
+                        <p id="blockedDevices">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡密列表 -->
+        <div class="card">
+            <div class="card-header">
+                卡密列表
+                <div class="float-end">
+                    <select class="form-select form-select-sm" id="keyFilter" style="width: 150px;">
+                        <option value="all">全部</option>
+                        <option value="active">未使用</option>
+                        <option value="used">已使用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>卡密</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>生成时间</th>
+                            <th>使用时间</th>
+                            <th>设备ID</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keyList">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 设备管理 -->
+        <div class="card">
+            <div class="card-header">
+                设备管理
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>设备ID</th>
+                            <th>设备信息</th>
+                            <th>首次验证</th>
+                            <th>最后验证</th>
+                            <th>验证次数</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deviceList">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html> 
