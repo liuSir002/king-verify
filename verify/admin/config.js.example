@@ -13,7 +13,7 @@ const GitHubConfig = {
     token: 'your_github_token_here',
     
     // 数据文件路径
-    dataPath: 'verify/admin/data/cards.json'
+    dataPath: 'data/cards.json'
 };
 
 // 不要修改这行
