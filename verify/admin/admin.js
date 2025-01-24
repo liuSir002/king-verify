@@ -3,22 +3,53 @@ const KeyManager = {
     keys: [],
     
     // 初始化数据
-    init() {
-        const savedKeys = localStorage.getItem('cardKeys');
-        if (savedKeys) {
-            this.keys = JSON.parse(savedKeys);
+    async init() {
+        try {
+            const response = await fetch('data/cards.json');
+            const data = await response.json();
+            this.keys = data.cards;
+            this.updateStats();
+        } catch (error) {
+            console.error('Error loading data:', error);
+            this.keys = [];
         }
-        this.updateStats();
     },
     
     // 保存数据
-    saveData() {
-        localStorage.setItem('cardKeys', JSON.stringify(this.keys));
-        this.updateStats();
+    async saveData() {
+        try {
+            const data = {
+                cards: this.keys,
+                stats: {
+                    unused: this.keys.filter(k => k.status === 'active').length,
+                    used: this.keys.filter(k => k.status === 'used').length,
+                    active: 0,
+                    blocked: 0
+                },
+                last_updated: new Date().toISOString()
+            };
+            
+            const response = await fetch('data/cards.json', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data, null, 4)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save data');
+            }
+            
+            this.updateStats();
+        } catch (error) {
+            console.error('Error saving data:', error);
+            alert('保存数据失败，请重试');
+        }
     },
     
     // 生成卡密
-    generateKeys(type, count, price) {
+    async generateKeys(type, count, price) {
         for (let i = 0; i < count; i++) {
             const key = this.generateRandomKey();
             this.keys.push({
@@ -31,7 +62,7 @@ const KeyManager = {
                 deviceId: null
             });
         }
-        this.saveData();
+        await this.saveData();
         return this.keys;
     },
     
@@ -67,11 +98,12 @@ const KeyManager = {
     },
     
     // 删除卡密
-    deleteKey(key) {
+    async deleteKey(key) {
         const index = this.keys.findIndex(k => k.key === key);
         if (index > -1) {
             this.keys.splice(index, 1);
-            this.saveData();
+            await this.saveData();
+            this.updateKeyList();
         }
     },
     
@@ -105,12 +137,13 @@ const KeyManager = {
 };
 
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 初始化卡密管理器
-    KeyManager.init();
+    await KeyManager.init();
+    KeyManager.updateKeyList();
     
     // 生成卡密表单提交
-    document.getElementById('generateForm').addEventListener('submit', function(e) {
+    document.getElementById('generateForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const keyType = document.getElementById('keyType').value;
@@ -124,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // 生成卡密
-            KeyManager.generateKeys(keyType, keyCount, keyPrice);
+            await KeyManager.generateKeys(keyType, keyCount, keyPrice);
             KeyManager.updateKeyList();
             
             // 清空输入
